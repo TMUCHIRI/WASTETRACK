@@ -6,12 +6,14 @@ import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 
+import { environment } from '../../environments/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class NotificationService {
     private messaging;
-    private apiUrl = 'http://127.0.0.1:8000/auth/fcm/register/';
+    private apiUrl = `${environment.apiUrl}/auth/fcm/register/`;
 
     constructor(private http: HttpClient, private snackBar: MatSnackBar) {
         try {
