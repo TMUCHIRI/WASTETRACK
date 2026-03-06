@@ -1,0 +1,68 @@
+# ── Python / Django ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# Django specific
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Migrations - keep them, but ignore local db artifacts
+# *.pyc already covered above
+
+# Secrets / credentials
+*.pem
+*.key
+serviceAccountKey.json
+firebase_credentials.json
+
+# ── Node / Angular ───────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Angular build output
+dist/
+.angular/
+.sass-cache/
+
+# Environment files (may contain API keys)
+FRONTEND/waste-track-frontend/src/environments/environment.ts
+FRONTEND/waste-track-frontend/src/environments/environment.prod.ts
+
+# ── Editor / OS ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
+.DS_Store
+
+# ── Antigravity agent internals ──────────────────────────────────────────────
+agent-os/
+.gemini/
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+run.txt

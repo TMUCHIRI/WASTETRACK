@@ -1,0 +1,10 @@
+Django
+djangorestframework
+djangorestframework-simplejwt
+psycopg2-binary
+django-cors-headers
+africastalking
+python-decouple
+daphne
+requests
+urllib3<2.0.0
