@@ -1,0 +1,33 @@
+/* src/styles.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: #f8f8f8;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background: #fff;
+}
+
+/* Ensure Material components inherit design */
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-raised-button, .mat-button {
+  font-size: 1rem !important;
+  border-radius: 5px !important;
+}
+
+.mat-icon {
+  vertical-align: middle;
+}

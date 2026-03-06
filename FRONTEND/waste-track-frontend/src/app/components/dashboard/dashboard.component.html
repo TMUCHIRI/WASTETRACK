@@ -1,0 +1,134 @@
+<div class="main">
+  <div class="container">
+
+    <!-- NAVBAR -->
+    <div class="navbar-section">
+      <div class="navbar-content">
+        <div class="brand-name" routerLink="/dashboard" style="cursor: pointer;">
+          <h1>WASTETRACK</h1>
+        </div>
+        <nav>
+          <p routerLink="/landing">Home</p>
+          <p routerLink="/dashboard">Dashboard</p>
+          <p routerLink="/report">Report</p>
+          <p (click)="logout()" style="cursor: pointer;">Logout</p>
+        </nav>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="dashboard-content">
+
+      <!-- INCENTIVES SECTION -->
+      <div class="points-summary">
+        <div class="stats-card">
+          <mat-icon class="icon-accent">stars</mat-icon>
+          <div class="stats-info">
+            <span class="label">CleanPoints Balance</span>
+            <h2 class="points-value">{{ points }}</h2>
+          </div>
+          <button mat-flat-button color="accent" class="redeem-btn"
+            (click)="redeem_section.scrollIntoView({behavior: 'smooth'})">Redeem Rewards</button>
+        </div>
+      </div>
+
+      <div class="hero-card">
+
+        <h2 class="hero-title">My Waste Reports</h2>
+        <p class="hero-subtitle">Track your impact on Kenya’s cleanliness.</p>
+
+        <!-- REPORT LIST -->
+        <div class="report-list">
+          <div class="report-card" *ngFor="let report of reports">
+            <img [src]="report.image" class="report-img" alt="Waste photo">
+            <div class="report-info">
+              <h4>{{ report.waste_type | titlecase }}</h4>
+              <p class="description">{{ report.description }}</p>
+              <div class="meta">
+                <span class="status" [ngClass]="report.status">
+                  {{ report.status | titlecase }}
+                </span>
+                <span class="urgency" [ngClass]="report.urgency">
+                  {{ report.urgency | titlecase }}
+                </span>
+              </div>
+              <p class="location">
+                <mat-icon>location_on</mat-icon>
+                {{ report.latitude | number:'1.4' }}, {{ report.longitude | number:'1.4' }}
+              </p>
+              <small class="date">{{ report.created_at | date:'medium' }}</small>
+
+              <!-- ADMIN FEEDBACK -->
+              <div class="feedback-box" *ngIf="report.admin_feedback">
+                <mat-icon>feedback</mat-icon>
+                <div class="f-text">
+                  <strong>Notes:</strong> {{ report.admin_feedback }}
+                </div>
+              </div>
+
+              <!-- RESUBMISSION / EDIT -->
+              <div class="card-actions" *ngIf="report.status === 'pending' || report.status === 'rejected'">
+                <button mat-button color="primary" (click)="editReport(report)">
+                  <mat-icon>edit</mat-icon> {{ report.status === 'rejected' ? 'Fix & Resubmit' : 'Edit Details' }}
+                </button>
+              </div>
+
+              <!-- UPDATE FULLNESS (RESUBMISSION LOGIC) -->
+              <div class="update-section" *ngIf="report.status === 'pending'">
+                <div class="slider-header">
+                  <span>Current Fullness: <strong>{{ report.estimated_fullness }}%</strong></span>
+                  <mat-icon matTooltip="Update if the bin is now fuller to earn bonus points!">info</mat-icon>
+                </div>
+                <mat-slider min="0" max="100" step="5" discrete color="primary">
+                  <input matSliderThumb [value]="report.estimated_fullness"
+                    (valueChange)="updateFullness(report, $event)">
+                </mat-slider>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REDEEM SECTION -->
+      <div class="redeem-section hero-card" #redeem_section>
+        <h3 class="hero-title">CleanRewards</h3>
+        <p class="hero-subtitle">Redeem your points for community benefits and eco-perks.</p>
+
+        <div class="rewards-grid">
+          <div class="reward-item">
+            <mat-icon>priority_high</mat-icon>
+            <h4>Priority Support</h4>
+            <p>Faster response for your reports.</p>
+            <button mat-stroked-button (click)="redeem('Priority Support')" [disabled]="points < 50">50 Pts</button>
+          </div>
+          <div class="reward-item">
+            <mat-icon>shopping_bag</mat-icon>
+            <h4>Eco-Bag Pack</h4>
+            <p>Set of 5 biodegradable liners.</p>
+            <button mat-stroked-button (click)="redeem('Eco-Bag Pack')" [disabled]="points < 80">80 Pts</button>
+          </div>
+          <div class="reward-item">
+            <mat-icon>local_activity</mat-icon>
+            <h4>Utility Voucher</h4>
+            <p>KES 200 off your next bill.</p>
+            <button mat-stroked-button (click)="redeem('Utility Voucher')" [disabled]="points < 150">150 Pts</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOOGLE MAP (BOTTOM) -->
+      <div class="map-section" *ngIf="googleMapsLoaded">
+        <h3 class="map-title">Your Reports on the Map</h3>
+        <div class="map-container">
+          <google-map height="500px" width="100%" [center]="mapCenter" [zoom]="11">
+            <map-marker *ngFor="let report of reports" [position]="{ lat: report.latitude, lng: report.longitude }"
+              [title]="report.waste_type" [options]="getMarkerOptions(report)">
+            </map-marker>
+          </google-map>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>

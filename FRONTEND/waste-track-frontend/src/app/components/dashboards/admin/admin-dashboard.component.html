@@ -1,0 +1,422 @@
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="brand" routerLink="/admin-dashboard" style="cursor: pointer;">WASTETRACK Admin</div>
+        <nav>
+            <a (click)="activeTab = 'stats'" [class.active]="activeTab === 'stats'">
+                <mat-icon>dashboard</mat-icon> Overview
+            </a>
+            <a (click)="activeTab = 'reports'" [class.active]="activeTab === 'reports'">
+                <mat-icon>assignment</mat-icon> Waste Reports
+            </a>
+            <a (click)="activeTab = 'feedback'" [class.active]="activeTab === 'feedback'">
+                <mat-icon>feedback</mat-icon> Collector Feedback
+                <span class="badge-count" *ngIf="feedbackReports.length > 0">{{feedbackReports.length}}</span>
+            </a>
+            <a (click)="activeTab = 'collectors'" [class.active]="activeTab === 'collectors'">
+                <mat-icon>group</mat-icon> Collectors &amp; Teams
+            </a>
+            <a (click)="activeTab = 'analytics'" [class.active]="activeTab === 'analytics'">
+                <mat-icon>bar_chart</mat-icon> Analytics
+            </a>
+            <a (click)="activeTab = 'tracking'" [class.active]="activeTab === 'tracking'">
+                <mat-icon>location_on</mat-icon> Live Tracking
+            </a>
+            <a (click)="activeTab = 'optimization'" [class.active]="activeTab === 'optimization'">
+                <mat-icon>auto_awesome</mat-icon> Optimization
+            </a>
+            <button mat-button color="warn" class="logout-btn" (click)="logout()">
+                <mat-icon>logout</mat-icon> Logout
+            </button>
+
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header>
+            <div class="header-left">
+                <h2>{{ activeTab | titlecase }} Center</h2>
+                <span class="date">{{ today | date:'fullDate' }}</span>
+            </div>
+            <div class="user-info">
+                <div class="admin-badge">
+                    <mat-icon>admin_panel_settings</mat-icon>
+                    <span>System Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <div *ngIf="activeTab === 'stats'" class="tab-content fade-in">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <mat-icon>receipt</mat-icon>
+                    <div class="details">
+                        <span class="label">Total Reports</span>
+                        <span class="value">{{ stats?.total || 0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WASTE REPORTS TAB -->
+        <div *ngIf="activeTab === 'reports'" class="tab-content fade-in">
+            <div class="card no-padding overflow-hidden">
+                <table mat-table [dataSource]="reports">
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef> ID </th>
+                        <td mat-cell *matCellDef="let report"> #{{report.id}} </td>
+                    </ng-container>
+
+                    <!-- PHOTO COLUMN (new) -->
+                    <ng-container matColumnDef="photo">
+                        <th mat-header-cell *matHeaderCellDef> Photo </th>
+                        <td mat-cell *matCellDef="let report">
+                            <img *ngIf="report.image" [src]="report.image" alt="Report photo" class="thumb-img"
+                                (click)="openPhotoModal(report.image)" matTooltip="Click to view full photo">
+                            <mat-icon *ngIf="!report.image" style="color:#ccc;">image_not_supported</mat-icon>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef> Type </th>
+                        <td mat-cell *matCellDef="let report" class="capitalize"> {{report.waste_type}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="urgency">
+                        <th mat-header-cell *matHeaderCellDef> Urgency </th>
+                        <td mat-cell *matCellDef="let report">
+                            <span class="badge" [class]="report.urgency">{{report.urgency}}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="fullness">
+                        <th mat-header-cell *matHeaderCellDef> Fullness </th>
+                        <td mat-cell *matCellDef="let report"> {{report.estimated_fullness}}% </td>
+                    </ng-container>
+                    <ng-container matColumnDef="region">
+                        <th mat-header-cell *matHeaderCellDef> Region </th>
+                        <td mat-cell *matCellDef="let report"> {{report.region_name || 'Global'}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef> Status </th>
+                        <td mat-cell *matCellDef="let report">
+                            <span class="status-chip" [class]="report.status">{{report.status}}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef> Action </th>
+                        <td mat-cell *matCellDef="let report">
+                            <div class="verify-btn-group">
+                                <!-- View Report button (always visible) -->
+                                <button mat-icon-button color="accent" (click)="viewReport(report)"
+                                    matTooltip="View Report Details">
+                                    <mat-icon>visibility</mat-icon>
+                                </button>
+
+                                <ng-container *ngIf="report.status === 'pending'">
+                                    <button mat-icon-button class="btn-verify-ok"
+                                        (click)="verifyReport(report.id, true)" matTooltip="Accurate (+10pts)">
+                                        <mat-icon>check_circle</mat-icon>
+                                    </button>
+                                    <button mat-icon-button class="btn-verify-fail"
+                                        (click)="verifyReport(report.id, false)" matTooltip="Inaccurate (-5pts)">
+                                        <mat-icon>cancel</mat-icon>
+                                    </button>
+                                </ng-container>
+
+                                <button mat-icon-button color="primary" [matMenuTriggerFor]="menu" matTooltip="Assign"
+                                    *ngIf="report.status === 'pending' || report.status === 'verified' || report.status === 'rejected'">
+                                    <mat-icon>assignment_ind</mat-icon>
+                                </button>
+
+                            </div>
+
+                            <mat-menu #menu="matMenu">
+                                <button mat-menu-item *ngFor="let collector of collectors"
+                                    (click)="assignReport(report.id, collector.id)">
+                                    <mat-icon>person</mat-icon>
+                                    <span>Assign to {{collector.first_name}}</span>
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row
+                        *matHeaderRowDef="['id', 'photo', 'type', 'fullness', 'region', 'urgency', 'status', 'action']">
+                    </tr>
+                    <tr mat-row
+                        *matRowDef="let row; columns: ['id', 'photo', 'type', 'fullness', 'region', 'urgency', 'status', 'action'];"
+                        class="hover-row"></tr>
+                </table>
+
+                <div *ngIf="reports.length === 0" class="empty-state">
+                    <mat-icon>inbox</mat-icon>
+                    <p>No reports found.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLLECTOR FEEDBACK TAB (new) -->
+        <div *ngIf="activeTab === 'feedback'" class="tab-content fade-in">
+            <div class="filter-row card glass mb-4" style="margin-bottom: 1rem; padding: 1rem;">
+                <mat-form-field appearance="outline" class="search-field" style="width: 100%;">
+                    <mat-label>Search Feedback Reports</mat-label>
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput [(ngModel)]="feedbackSearchTerm" placeholder="Waste type or feedback keyword...">
+                </mat-form-field>
+            </div>
+
+            <div *ngIf="feedbackReports.length === 0" class="empty-state card">
+                <mat-icon style="font-size: 48px; width: 48px; height: 48px;">inbox</mat-icon>
+                <p>No collector feedback available yet.</p>
+            </div>
+
+            <div class="feedback-grid">
+                <div class="feedback-card card" *ngFor="let report of feedbackReports">
+                    <div class="feedback-card-header">
+                        <span class="report-id">#{{report.id}} &mdash; {{report.waste_type | titlecase}}</span>
+                        <span class="status-chip" [class]="report.status">{{report.status}}</span>
+                    </div>
+
+                    <div class="feedback-photos">
+                        <!-- Citizen's original photo -->
+                        <div class="photo-block">
+                            <p class="photo-label"><mat-icon
+                                    style="font-size:16px;vertical-align:middle;">person</mat-icon> Citizen Photo</p>
+                            <img [src]="report.image" alt="Citizen photo" class="feedback-img"
+                                (click)="openPhotoModal(report.image)">
+                        </div>
+                        <!-- Collector's verification photo -->
+                        <div class="photo-block" *ngIf="report.collector_image">
+                            <p class="photo-label"><mat-icon
+                                    style="font-size:16px;vertical-align:middle;">local_shipping</mat-icon> Collector
+                                Photo</p>
+                            <img [src]="report.collector_image" alt="Collector photo" class="feedback-img"
+                                (click)="openPhotoModal(report.collector_image)">
+                        </div>
+                        <div class="photo-block no-photo" *ngIf="!report.collector_image">
+                            <mat-icon>no_photography</mat-icon>
+                            <p>No collector photo</p>
+                        </div>
+                    </div>
+
+                    <div class="feedback-note">
+                        <mat-icon>comment</mat-icon>
+                        <p>{{report.collector_feedback}}</p>
+                    </div>
+
+                    <div class="feedback-actions">
+                        <p class="action-hint">Adjust citizen points based on this feedback:</p>
+
+                        <!-- Already adjusted: show read-only badge -->
+                        <div *ngIf="report.points_adjusted" class="adjusted-badge">
+                            <mat-icon>check_circle</mat-icon>
+                            <span>Points already adjusted for this report</span>
+                        </div>
+
+                        <!-- Not yet adjusted: show action buttons -->
+                        <div class="action-btns" *ngIf="!report.points_adjusted">
+                            <button mat-flat-button color="primary" (click)="adjustPoints(report, true)">
+                                <mat-icon>thumb_up</mat-icon> Award +10 pts
+                            </button>
+                            <button mat-flat-button color="warn" (click)="adjustPoints(report, false)">
+                                <mat-icon>thumb_down</mat-icon> Deduct 5 pts
+                            </button>
+                            <button mat-stroked-button color="accent" (click)="viewReport(report)">
+                                <mat-icon>open_in_full</mat-icon> Full Details
+                            </button>
+                        </div>
+                        <!-- Still allow viewing details even after adjustment -->
+                        <div *ngIf="report.points_adjusted">
+                            <button mat-stroked-button color="accent" (click)="viewReport(report)">
+                                <mat-icon>open_in_full</mat-icon> Full Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div *ngIf="activeTab === 'collectors'" class="tab-content fade-in">
+            <div class="filter-row card glass mb-4" style="margin-bottom: 1rem; padding: 1rem;">
+                <mat-form-field appearance="outline" class="search-field" style="width: 100%;">
+                    <mat-label>Search Users</mat-label>
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput [(ngModel)]="searchTerm" placeholder="Name or email...">
+                </mat-form-field>
+            </div>
+            <div class="card no-padding overflow-hidden">
+                <table mat-table [dataSource]="filteredUsers">
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef> Name </th>
+                        <td mat-cell *matCellDef="let user"> {{user.first_name}} {{user.last_name}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="email">
+                        <th mat-header-cell *matHeaderCellDef> Email </th>
+                        <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="points">
+                        <th mat-header-cell *matHeaderCellDef> Points </th>
+                        <td mat-cell *matCellDef="let user"><strong>{{user.points}}</strong></td>
+                    </ng-container>
+                    <ng-container matColumnDef="role">
+                        <th mat-header-cell *matHeaderCellDef> Current Role </th>
+                        <td mat-cell *matCellDef="let user">
+                            <span class="role-badge" [class]="user.role">{{user.role}}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef> Change Role </th>
+                        <td mat-cell *matCellDef="let user">
+                            <button mat-button class="btn-promote" *ngIf="user.role === 'citizen'"
+                                (click)="changeRole(user.id, 'collector')">
+                                <mat-icon>trending_up</mat-icon> Promote
+                            </button>
+                            <button mat-button color="warn" *ngIf="user.role === 'collector'"
+                                (click)="changeRole(user.id, 'citizen')">
+                                <mat-icon>trending_down</mat-icon> Demote
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['name', 'email', 'points', 'role', 'action']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['name', 'email', 'points', 'role', 'action'];"
+                        class="hover-row">
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+        <div *ngIf="activeTab === 'analytics'" class="tab-content fade-in">
+            <div class="actions-row">
+                <button mat-flat-button color="primary" (click)="exportLogs()">
+                    <mat-icon>download</mat-icon> Export Waste Logs (CSV)
+                </button>
+            </div>
+            <div class="card glass transition-all">
+                <h3>Weight Analysis</h3>
+                <div *ngIf="weightStats" class="weight-summary">
+                    <div class="big-stat animated">
+                        <span class="val">{{ weightStats.total_weight_kg | number:'1.1-2' }}</span>
+                        <span class="unit">Total Kilograms</span>
+                    </div>
+                    <div class="type-summary">
+                        <div *ngFor="let item of weightStats.by_type_weight | keyvalue" class="type-stat hover-lift">
+                            <span class="t-label">{{ item.key }}</span>
+                            <span class="t-val">{{ item.value }} kg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div *ngIf="activeTab === 'tracking'" class="tab-content tracking-tab fade-in">
+            <div class="card map-container glass no-padding overflow-hidden">
+                <google-map height="600px" width="100%" [center]="mapCenter" [zoom]="mapZoom">
+                    <map-marker *ngFor="let m of liveMarkers" [position]="m.position" [label]="m.label"
+                        [title]="m.title">
+                    </map-marker>
+                </google-map>
+            </div>
+            <div class="tracking-legend card glass">
+                <h3>Live Collectors</h3>
+                <div class="collector-list">
+                    <div *ngFor="let m of liveMarkers" class="collector-item hover-lift">
+                        <mat-icon color="primary">local_shipping</mat-icon>
+                        <div class="c-info">
+                            <span class="c-name">{{ m.label }}</span>
+                            <span class="c-status">Active Now</span>
+                        </div>
+                        <span class="pulse-dot"></span>
+                    </div>
+                </div>
+                <div *ngIf="liveMarkers.length === 0" class="empty-state small">
+                    <mat-icon>wifi_off</mat-icon>
+                    <p>No collectors online.</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="activeTab === 'optimization'" class="tab-content fade-in">
+
+            <div class="optimization-grid">
+                <!-- AI CLUSTERS MAP -->
+                <div class="card no-padding overflow-hidden">
+                    <header class="p-4 border-b">
+                        <h3 class="font-bold">AI Grouped Batch Routes</h3>
+                        <p class="text-sm text-gray-500">Reports grouped within 3km to optimize collection trips.
+                        </p>
+                    </header>
+                    <google-map height="450px" width="100%" [center]="mapCenter" [zoom]="13">
+                        <ng-container *ngFor="let cluster of clusters">
+                            <map-marker [position]="cluster.center" [label]="(cluster.count).toString()"
+                                [title]="'Cluster ' + cluster.cluster_id + ' (' + cluster.count + ' reports)'">
+                            </map-marker>
+                            <map-circle [center]="cluster.center" [radius]="1500"
+                                [options]="{fillColor: '#0a3d62', fillOpacity: 0.1, strokeColor: '#0a3d62', strokeOpacity: 0.3}">
+                            </map-circle>
+                        </ng-container>
+                    </google-map>
+                    <div class="p-4 bg-gray-50 flex gap-4 overflow-x-auto">
+                        <div class="mini-cluster-card" *ngFor="let c of clusters">
+                            <span class="c-id">Route #{{c.cluster_id}}</span>
+                            <span class="c-count">{{c.count}} Stops</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REGIONAL THRESHOLDS -->
+                <div class="card glass">
+                    <header class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold">Regional Fullness Thresholds</h3>
+                        <mat-icon color="primary"
+                            matTooltip="Adjust when bins are eligible for collection by region">info</mat-icon>
+                    </header>
+                    <div class="region-list">
+                        <div class="region-item" *ngFor="let region of regions">
+                            <div class="r-info">
+                                <span class="r-name">{{region.name}}</span>
+                                <span class="r-current">Current: {{region.threshold}}%</span>
+                            </div>
+                            <div class="r-actions">
+                                <mat-slider min="50" max="100" step="5" discrete>
+                                    <input matSliderThumb [value]="region.threshold"
+                                        (valueChange)="updateThreshold(region, $event)">
+                                </mat-slider>
+                            </div>
+                        </div>
+                        <div *ngIf="regions.length === 0" class="empty-state">
+                            <p>No regions defined in system.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAVINGS DASHBOARD -->
+            <div class="savings-summary card mt-6" *ngIf="stats?.savings">
+                <header class="mb-4">
+                    <h3 class="font-bold">Cost-Saving Impact</h3>
+                    <p class="text-sm">Real-time estimate of efficiency gains from clustering.</p>
+                </header>
+                <div class="savings-grid">
+                    <div class="savings-card green">
+                        <mat-icon>local_gas_station</mat-icon>
+                        <div class="s-val">{{stats.savings.estimated_fuel_saved_liters}}L</div>
+                        <div class="s-label">Fuel Saved</div>
+                    </div>
+                    <div class="savings-card blue">
+                        <mat-icon>route</mat-icon>
+                        <div class="s-val">{{stats.savings.trips_saved}}</div>
+                        <div class="s-label">Trips Optimized</div>
+                    </div>
+                    <div class="savings-card purple">
+                        <mat-icon>verified_user</mat-icon>
+                        <div class="s-val">{{stats.savings.accuracy_rate | number:'1.0-1'}}%</div>
+                        <div class="s-label">Reporting Accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

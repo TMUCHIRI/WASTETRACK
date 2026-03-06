@@ -1,0 +1,75 @@
+<!-- src/app/components/register/register.component.html -->
+<div class="auth-container">
+  <div class="container">
+    <div class="navbar-section">
+      <div class="navbar-content">
+        <div class="brand-name" routerLink="/landing" style="cursor: pointer;">
+          <h1>WASTETRACK</h1>
+        </div>
+        <nav>
+          <a routerLink="/landing" class="nav-link">Home</a>
+          <a routerLink="/landing" fragment="about" class="nav-link">About Us</a>
+          <a routerLink="/landing" fragment="contact" class="nav-link">Contact Us</a>
+          <a routerLink="/login" class="nav-link active">Sign In</a>
+        </nav>
+      </div>
+    </div>
+    <div class="auth-form">
+      <h2>Create Account</h2>
+      <p>Join WasteTrack KE</p>
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <form #registerForm="ngForm" (ngSubmit)="onRegister(registerForm.value)">
+        <div class="inputs">
+          <div class="name-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>First Name</mat-label>
+              <input matInput name="first_name" [(ngModel)]="registerData.first_name" required>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Last Name</mat-label>
+              <input matInput name="last_name" [(ngModel)]="registerData.last_name" required>
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput name="phone" [(ngModel)]="registerData.phone" placeholder="+254 700 123 456"
+              pattern="^\+254[17]\d{8}$" required>
+            <mat-icon matSuffix>phone_iphone</mat-icon>
+            <mat-error *ngIf="registerForm.controls['phone']?.errors?.['pattern']">
+              Use format: +2547xxxxxxxx or +2541xxxxxxxx
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput name="email" [(ngModel)]="registerData.email" type="email" required>
+            <mat-icon matSuffix>email</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput name="password" [(ngModel)]="registerData.password"
+              [type]="showPassword ? 'text' : 'password'" minlength="6" required>
+            <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+              <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>I am a...</mat-label>
+            <mat-select name="role" [(ngModel)]="registerData.role" required>
+              <mat-option value="citizen">Citizen</mat-option>
+              <mat-option value="collector">Collector</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="btns">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!registerForm.form.valid || isLoading">
+            <span *ngIf="isLoading">Loading...</span>
+            <span *ngIf="!isLoading">Create Account</span>
+          </button>
+          <a mat-button routerLink="/login">Already have account?</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

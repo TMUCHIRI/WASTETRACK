@@ -1,0 +1,210 @@
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.sidebar {
+    width: 260px;
+    background: #0f172a;
+    color: white;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: #10b981;
+}
+
+.welcome-msg {
+    margin-bottom: 32px;
+    padding: 12px;
+    background: #1e293b;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.welcome-msg span {
+    display: block;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #94a3b8;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+nav a:hover,
+nav a.active {
+    background: #1e293b;
+    color: white;
+}
+
+.logout-btn {
+    margin-top: auto;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+}
+
+.no-padding {
+    padding: 0;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+table {
+    width: 100%;
+}
+
+.sub {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #64748b;
+}
+
+.route-actions {
+    margin-bottom: 24px;
+}
+
+.route-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    height: 600px;
+}
+
+.map-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.map-placeholder {
+    height: 100%;
+    width: 100%;
+    background: #e2e8f0;
+}
+
+.steps-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+}
+
+.route-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.step-num {
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.step-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.step-info .type {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.step-info .dist {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.sorting-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 400px;
+    margin-top: 16px;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-badge.collected {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.status-badge mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}

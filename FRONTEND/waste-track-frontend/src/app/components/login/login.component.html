@@ -1,0 +1,68 @@
+<!-- src/app/components/login/login.component.html -->
+<div class="auth-container">
+  <div class="container">
+    <div class="navbar-section">
+      <div class="navbar-content">
+        <div class="brand-name" routerLink="/landing" style="cursor: pointer;">
+          <h1>WASTETRACK</h1>
+        </div>
+        <nav>
+          <a routerLink="landing" class="nav-link">Home</a>
+          <a routerLink="landing" fragment="about" class="nav-link">About Us</a>
+          <a routerLink="landing" fragment="contact" class="nav-link">Contact Us</a>
+          <a routerLink="register" class="nav-link active">Sign Up</a>
+        </nav>
+      </div>
+    </div>
+    <div class="auth-form">
+      <h2>Sign In</h2>
+      <p>Access your WasteTrack account</p>
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <form *ngIf="step === 'login'" #loginForm="ngForm" (ngSubmit)="onLogin(loginForm.value)">
+        <div class="inputs">
+          <mat-form-field appearance="outline">
+            <mat-label>Phone or Email</mat-label>
+            <input matInput name="identifier" [(ngModel)]="loginData.identifier" type="text" required>
+            <mat-icon matSuffix>person</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput name="password" [(ngModel)]="loginData.password" [type]="showPassword ? 'text' : 'password'"
+              required>
+            <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+              <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+        <div class="forgot-link">
+          <a routerLink="/forgot-password" style="color: #ff793f; font-weight: 500;">Forgot Password?</a>
+        </div>
+        <div class="btns">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.form.valid || isLoading">
+            {{ isLoading ? 'Loading...' : 'Sign In' }}
+          </button>
+          <a mat-button routerLink="/register">Create Account</a>
+        </div>
+      </form>
+
+      <!-- OTP Step -->
+      <form *ngIf="step === 'otp'" (ngSubmit)="onVerifyOtp()">
+        <p>Verification code sent to your registered contact.</p>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Verification Code</mat-label>
+          <input matInput [(ngModel)]="otp" name="otp" required maxlength="6" autocomplete="one-time-code">
+          <mat-icon matSuffix>lock_person</mat-icon>
+        </mat-form-field>
+        <div class="btns">
+          <button mat-raised-button color="primary" type="submit" [disabled]="otp.length < 6 || isLoading">
+            {{ isLoading ? 'Verifying...' : 'Verify & Sign In' }}
+          </button>
+          <button mat-button type="button" (click)="step = 'login'">Back to Login</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,180 @@
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="brand" routerLink="/collector-dashboard" style="cursor: pointer;">WASTETRACK Collector</div>
+        <div class="welcome-msg" *ngIf="collectorName">
+            Welcome, <span>{{ collectorName }}</span>
+        </div>
+        <nav>
+            <a (click)="activeTab = 'schedules'" [class.active]="activeTab === 'schedules'">
+                <mat-icon>today</mat-icon> My Schedule
+            </a>
+            <a (click)="activeTab = 'history'" [class.active]="activeTab === 'history'">
+                <mat-icon>history</mat-icon> Collected History
+            </a>
+            <a (click)="activeTab = 'route'" [class.active]="activeTab === 'route'">
+                <mat-icon>route</mat-icon> Optimized Route
+            </a>
+            <a (click)="activeTab = 'sorting'" [class.active]="activeTab === 'sorting'">
+                <mat-icon>scale</mat-icon> Waste Sorting
+            </a>
+            <button mat-button color="warn" class="logout-btn" (click)="logout()">
+                <mat-icon>logout</mat-icon> Logout
+            </button>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header>
+            <h2>{{ activeTab | titlecase }}</h2>
+            <div class="user-info">
+                <span>Collector Portal</span>
+                <mat-icon>badge</mat-icon>
+            </div>
+        </header>
+
+        <!-- My Schedule (Pending) -->
+        <div *ngIf="activeTab === 'schedules'" class="tab-content">
+            <div class="card no-padding">
+                <div class="card-header">
+                    <h3>Pending Assignments</h3>
+                </div>
+                <table mat-table [dataSource]="pendingSchedules" *ngIf="pendingSchedules.length > 0">
+                    <ng-container matColumnDef="report">
+                        <th mat-header-cell *matHeaderCellDef> Location / Type </th>
+                        <td mat-cell *matCellDef="let s">
+                            <strong>{{ s.report_details.waste_type }}</strong><br>
+                            <span class="sub">{{ s.report_details.latitude }}, {{ s.report_details.longitude }}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="date">
+                        <th mat-header-cell *matHeaderCellDef> Scheduled For </th>
+                        <td mat-cell *matCellDef="let s"> {{ s.scheduled_date | date:'short' }} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Action </th>
+                        <td mat-cell *matCellDef="let s">
+                            <button mat-stroked-button color="primary" (click)="viewReport(s.report_details)"
+                                style="margin-right: 8px;">
+                                <mat-icon>visibility</mat-icon> View Report
+                            </button>
+                            <button mat-raised-button color="primary" (click)="updateStatus(s.report, 'collected')"
+                                *ngIf="false">
+                                <mat-icon>check_circle</mat-icon> Mark Collected
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['report', 'date', 'actions']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['report', 'date', 'actions'];"></tr>
+                </table>
+                <div *ngIf="pendingSchedules.length === 0" class="empty-state">
+                    <mat-icon
+                        style="font-size: 48px; width: 48px; height: 48px; margin-bottom: 1rem;">done_all</mat-icon>
+                    <p>Great job! No pending collections for today.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collected History -->
+        <div *ngIf="activeTab === 'history'" class="tab-content">
+            <div class="card no-padding">
+                <div class="card-header">
+                    <h3>Completed Collections</h3>
+                </div>
+                <table mat-table [dataSource]="historySchedules" *ngIf="historySchedules.length > 0">
+                    <ng-container matColumnDef="report">
+                        <th mat-header-cell *matHeaderCellDef> Location / Type </th>
+                        <td mat-cell *matCellDef="let s">
+                            <strong>{{ s.report_details.waste_type }}</strong><br>
+                            <span class="sub">{{ s.report_details.latitude }}, {{ s.report_details.longitude }}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="date">
+                        <th mat-header-cell *matHeaderCellDef> Date Completed </th>
+                        <td mat-cell *matCellDef="let s"> {{ s.scheduled_date | date:'short' }} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Action </th>
+                        <td mat-cell *matCellDef="let s">
+                            <button mat-icon-button (click)="viewReport(s.report_details)" matTooltip="View Details">
+                                <mat-icon color="primary">info</mat-icon>
+                            </button>
+                            <span class="status-badge collected">
+                                <mat-icon>verified</mat-icon> Collected
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['report', 'date', 'actions']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['report', 'date', 'actions'];"></tr>
+                </table>
+                <div *ngIf="historySchedules.length === 0" class="empty-state">
+                    <p>No collection history found.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Optimized Route with Map -->
+        <div *ngIf="activeTab === 'route'" class="tab-content">
+            <div class="route-actions">
+                <button mat-raised-button color="accent" (click)="generateRoute()">
+                    <mat-icon>auto_fix_high</mat-icon> Generate Smart Route
+                </button>
+            </div>
+
+            <div class="route-layout">
+                <div class="map-card">
+                    <!-- Placeholder for Google Map -->
+                    <div class="map-placeholder">
+                        <google-map height="100%" width="100%" [center]="center" [zoom]="zoom">
+                            <map-marker *ngFor="let m of routeMarkers" [position]="m.position"
+                                [title]="m.title"></map-marker>
+                        </google-map>
+                    </div>
+                </div>
+                <div class="steps-card">
+                    <h3>Route Sequence</h3>
+                    <div class="route-steps" *ngIf="optimizedRoute">
+                        <div *ngFor="let step of optimizedRoute.route_data; let i = index" class="step">
+                            <div class="step-num">{{ i + 1 }}</div>
+                            <div class="step-info">
+                                <span class="type">{{ step.waste_type }}</span>
+                                <span class="dist">+{{ step.distance_from_previous | number:'1.1-2' }} km</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="!optimizedRoute" class="empty-info">
+                        Click "Generate" to calculate the best path.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waste Sorting & Weight Logging -->
+        <div *ngIf="activeTab === 'sorting'" class="tab-content">
+            <div class="card sorting-form">
+                <h3>Log Sorted Waste</h3>
+                <form #sortForm="ngForm" (ngSubmit)="logWaste(sortForm.value)">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Waste Type</mat-label>
+                        <mat-select name="waste_type" ngModel required>
+                            <mat-option value="plastic">Plastic</mat-option>
+                            <mat-option value="organic">Organic</mat-option>
+                            <mat-option value="paper">Paper</mat-option>
+                            <mat-option value="metal">Metal</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Weight (kg)</mat-label>
+                        <input matInput type="number" name="weight" ngModel required step="0.1">
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" type="submit" [disabled]="!sortForm.form.valid">
+                        Log Weight
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</div>

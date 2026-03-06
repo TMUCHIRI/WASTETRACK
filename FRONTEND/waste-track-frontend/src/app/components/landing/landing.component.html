@@ -1,0 +1,146 @@
+<!-- src/app/components/landing/landing.component.html -->
+<div class="main">
+  <div class="container">
+    <!-- Navbar -->
+    <div class="navbar-section">
+      <div class="brand-name">
+        <h1>WASTETRACK</h1>
+      </div>
+      <nav>
+        <p routerLink="/landing" class="active">Home</p>
+        <p routerLink="/landing" fragment="about">About Us</p>
+        <p routerLink="/landing" fragment="contact">Contact Us</p>
+        <p *ngIf="!isLoggedIn"><a routerLink="/login">Join Us</a></p>
+        <p *ngIf="isLoggedIn"><a (click)="goToDashboard()"
+            style="cursor: pointer; color: #10b981; font-weight: bold;">Dashboard</a></p>
+      </nav>
+    </div>
+
+    <!-- Hero Section with Stats -->
+    <div class="hero">
+      <div class="hero-text">
+        <h1>WELCOME TO WASTETRACK</h1>
+        <p>WASTE AND RECYCLING SOLUTIONS</p>
+        <p>For your home, neighbourhood and business</p>
+        <p>Track your waste and save the planet</p>
+        <!-- Stats from Previous Version -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">+12K</div>
+            <div class="stat-label">Bins Reported</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">95%</div>
+            <div class="stat-label">Collection Rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">24hrs</div>
+            <div class="stat-label">Avg Response</div>
+          </div>
+        </div>
+      </div>
+      <p class="get-started">Ready to get started?</p>
+      <div class="get-started-btns" *ngIf="!isLoggedIn">
+        <button mat-raised-button color="primary" routerLink="/register">Sign Up</button>
+        <button mat-button routerLink="/login">Log In</button>
+      </div>
+      <div class="get-started-btns" *ngIf="isLoggedIn">
+        <button mat-raised-button color="primary" (click)="goToDashboard()">Go to Dashboard</button>
+      </div>
+    </div>
+
+    <!-- About Us Section -->
+    <div class="about-us" id="about">
+      <div class="residential-column">
+        <i class="fas fa-house-chimney icon"></i>
+        <h3>Residential</h3>
+        <p>Safe and reliable curbside collection service for residential customers</p>
+      </div>
+      <div class="commercial-column">
+        <i class="fas fa-building icon"></i>
+        <h3>Commercial</h3>
+        <p>Cost-effective waste management solutions for your business</p>
+      </div>
+      <div class="neighborhood-column">
+        <i class="fas fa-city icon"></i>
+        <h3>Neighborhood</h3>
+        <p>Community-based waste management solutions for your neighborhood</p>
+      </div>
+    </div>
+
+    <!-- Contact Us Section -->
+    <div class="contact-us" id="contact">
+      <div class="contact-form">
+        <div class="left-side">
+          <h2>Talk to us</h2>
+          <p>Have any questions?</p>
+          <form #contactForm="ngForm" (ngSubmit)="onContactSubmit()">
+            <div class="inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Your Name</mat-label>
+                <input matInput name="name" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Your Email</mat-label>
+                <input matInput name="email" type="email" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Message</mat-label>
+                <textarea matInput name="message" rows="4" required></textarea>
+              </mat-form-field>
+            </div>
+            <div class="btns">
+              <button mat-raised-button color="primary" type="submit" [disabled]="!contactForm.form.valid">
+                Send
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="right-side">
+          <h2>Contact Information</h2>
+          <p>WasteTrack Company Ltd</p>
+          <p>East Africa, Kenya</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="top-footer">
+        <div class="info">
+          <i class="fas fa-trash-arrow-up icon"></i>
+          <h3>WasteTrack</h3>
+          <p>WasteTrack is a waste management company that provides waste and recycling solutions for residential,
+            commercial and neighborhood customers</p>
+        </div>
+        <div class="quick-links">
+          <h3>Quick Links</h3>
+          <p routerLink="/landing">Home</p>
+          <p routerLink="/landing" fragment="about">About Us</p>
+          <p routerLink="/landing" fragment="contact">Contact Us</p>
+          <p *ngIf="!isLoggedIn" routerLink="/login">Join Us</p>
+          <p *ngIf="isLoggedIn" (click)="goToDashboard()" style="cursor: pointer;">Dashboard</p>
+        </div>
+        <div class="contact-info">
+          <h3>Contact Information</h3>
+          <p>0712345678</p>
+          <p>Monday - Friday: 8:00am to 5:00pm</p>
+          <p>Weekends: 10:00am to 3:00pm</p>
+          <p>Closed on holidays</p>
+          <p>customerservice&#64;yopmail.com</p>
+          <p>WasteTrack Company Ltd</p>
+          <p>East Africa, Kenya</p>
+        </div>
+        <div class="social-media">
+          <h3>Follow Us</h3>
+          <i class="fab fa-twitter icon"></i><br>
+          <i class="fab fa-instagram icon"></i><br>
+          <i class="fab fa-facebook icon"></i>
+        </div>
+      </div>
+      <div class="bottom-footer">
+        <p>&copy; 2025 WasteTrack Co. All rights reserved</p>
+      </div>
+    </div>
+  </div>
+</div>

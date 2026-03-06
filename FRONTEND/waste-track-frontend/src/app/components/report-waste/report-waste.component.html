@@ -1,0 +1,118 @@
+<!-- src/app/components/report-waste/report-waste.component.html -->
+<div class="main">
+  <div class="container">
+
+    <!-- ==== NAVBAR ==== -->
+    <div class="navbar-section">
+      <div class="navbar-content">
+        <div class="brand-name" routerLink="/dashboard" style="cursor: pointer;">
+          <h1>WASTETRACK</h1>
+        </div>
+        <nav>
+          <p routerLink="/landing">Home</p>
+          <p routerLink="/dashboard">Dashboard</p>
+          <p (click)="logout()" style="cursor: pointer;">Logout</p>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ==== HERO CARD (report form) ==== -->
+    <div class="hero-card">
+      <h2 class="hero-title">Report Waste</h2>
+      <p class="hero-subtitle">Help us keep Kenya clean – one photo at a time.</p>
+
+      <form (ngSubmit)="onSubmit()" #reportForm="ngForm" class="report-form">
+        <!-- Waste Type & Urgency -->
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Waste Type</mat-label>
+            <mat-select [(ngModel)]="report.waste_type" name="waste_type" required>
+              <mat-option value="plastic">Plastic</mat-option>
+              <mat-option value="organic">Organic</mat-option>
+              <mat-option value="paper">Paper/Cardboard</mat-option>
+              <mat-option value="metal">Metal</mat-option>
+              <mat-option value="glass">Glass</mat-option>
+              <mat-option value="ewaste">E-Waste</mat-option>
+              <mat-option value="hazardous">Hazardous</mat-option>
+              <mat-option value="general">General</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Urgency</mat-label>
+            <mat-select [(ngModel)]="report.urgency" name="urgency" required>
+              <mat-option value="low">Low</mat-option>
+              <mat-option value="medium">Medium</mat-option>
+              <mat-option value="high">High</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput [(ngModel)]="report.description" name="description" rows="3" required></textarea>
+        </mat-form-field>
+
+        <!-- Fullness Slider -->
+        <div class="slider-section">
+          <label>Estimated Fullness: {{ report.estimated_fullness }}%</label>
+          <mat-slider min="0" max="100" step="10" showTickMarks discrete>
+            <input matSliderThumb [(ngModel)]="report.estimated_fullness" name="estimated_fullness">
+          </mat-slider>
+          <p class="hint-text" *ngIf="report.estimated_fullness < 75 && report.urgency !== 'high'">
+            <mat-icon>info</mat-icon>
+            Bins below 75% may have delayed collection to save fuel. (+5 pts for accuracy)
+          </p>
+          <p class="hint-text bonus" *ngIf="report.estimated_fullness >= 75">
+            <mat-icon>stars</mat-icon>
+            Ready for collection!
+          </p>
+        </div>
+
+
+        <!-- Image Upload -->
+        <div class="image-upload" (click)="fileInput.click()">
+          <input #fileInput type="file" accept="image/*" (change)="onFileSelect($event)" hidden>
+          <div *ngIf="!imagePreview" class="upload-placeholder">
+            <mat-icon class="icon-large">camera_alt</mat-icon>
+            <p>Tap to take / upload photo</p>
+          </div>
+          <img *ngIf="imagePreview" [src]="imagePreview" class="preview-img">
+        </div>
+
+        <!-- Location -->
+        <div class="location-section">
+          <button mat-stroked-button type="button" (click)="getLocation()" [disabled]="gettingLocation">
+            <mat-icon>my_location</mat-icon>
+            {{ gettingLocation ? 'Getting Location…' : 'Use My Location' }}
+          </button>
+          <p *ngIf="report.latitude && report.longitude" class="location-text">
+            {{ report.latitude | number:'1.6' }}, {{ report.longitude | number:'1.6' }}
+          </p>
+        </div>
+
+        <!-- Submit -->
+        <div class="submit-section">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!reportForm.valid || isSubmitting">
+            <span *ngIf="isSubmitting">Submitting…</span>
+            <span *ngIf="!isSubmitting">Report Waste</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    <!-- Add Google Map -->
+    <div class="map-container" *ngIf="googleMapsLoaded">
+      <google-map height="300px" width="100%" [center]="mapCenter" [zoom]="15" (mapClick)="onMapClick($event)">
+        <map-marker *ngIf="markerPosition" [position]="markerPosition">
+        </map-marker>
+      </google-map>
+    </div>
+
+    <!-- Show selected location -->
+    <p *ngIf="report.latitude" class="location-text">
+      Selected: {{ report.latitude | number:'1.6' }}, {{ report.longitude | number:'1.6' }}
+    </p>
+
+  </div>
+</div>
